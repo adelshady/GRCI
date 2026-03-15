@@ -1,0 +1,99 @@
+<div class="modal-header am-header">
+  <div class="d-flex align-items-center gap-2">
+    <div class="am-header-icon">
+      <i class="fa fa-paperclip"></i>
+    </div>
+    <div>
+      <div class="am-header-title">{{ '::Compliance:Attachment:Title' | abpLocalization }}</div>
+      <div class="am-header-sub">{{ item.requirementTextEn }}</div>
+    </div>
+  </div>
+  <button type="button" class="btn-close btn-close-white" (click)="dismiss()"></button>
+</div>
+
+<div class="modal-body am-body">
+
+  <!-- ── Upload Zone ───────────────────────────────────────────── -->
+  <div class="am-upload-zone">
+    <div class="am-upload-icon">
+      <i class="fa fa-cloud-upload"></i>
+    </div>
+    <div class="am-upload-text">Drop files here or</div>
+    <label class="am-pick-btn" for="fileInput">Browse files</label>
+    <input
+      id="fileInput"
+      type="file"
+      class="d-none"
+      accept=".pdf,.png,.jpg,.jpeg,.docx"
+      (change)="onFileSelected($event)"
+    />
+    <div class="am-upload-hint">PDF, PNG, JPG, JPEG, DOCX — max 10 MB</div>
+    <div *ngIf="selectedFile" class="am-selected-file">
+      <i class="fa fa-file-o me-1"></i>{{ selectedFile.name }}
+      <button class="btn btn-primary btn-sm ms-3 px-4" (click)="upload()" [disabled]="uploading">
+        <span *ngIf="uploading" class="spinner-border spinner-border-sm me-1"></span>
+        <i *ngIf="!uploading" class="fa fa-upload me-1"></i>
+        {{ '::Compliance:Attachment:Upload' | abpLocalization }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Files Section ─────────────────────────────────────────── -->
+  <div class="am-files-section">
+    <div class="am-files-header">
+      <span class="am-files-title">
+        <i class="fa fa-folder-open-o me-1"></i>
+        Attached Files
+      </span>
+      <span class="am-file-count" *ngIf="!loading">{{ attachments.length }}</span>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="d-flex justify-content-center py-4">
+      <div class="spinner-border" style="width:1.75rem;height:1.75rem" role="status"></div>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!loading && attachments.length === 0" class="am-empty">
+      <i class="fa fa-paperclip am-empty-icon"></i>
+      <div class="fw-semibold mt-2" style="color:var(--g-text-muted)">
+        {{ '::Compliance:Attachment:NoAttachments' | abpLocalization }}
+      </div>
+      <div style="font-size:.78rem;color:var(--g-text-dim);margin-top:.25rem">
+        Upload your first file using the zone above
+      </div>
+    </div>
+
+    <!-- File Grid -->
+    <div *ngIf="!loading && attachments.length > 0" class="am-file-grid">
+      <div *ngFor="let att of attachments" class="am-file-card">
+        <div class="am-file-type-icon">
+          <i [ngClass]="getFileIcon(att.contentType)" class="fa-lg"></i>
+        </div>
+        <div class="am-file-name" title="{{ att.fileName }}">{{ att.fileName }}</div>
+        <div class="am-file-meta">
+          <span>{{ formatFileSize(att.size) }}</span>
+          <span class="am-meta-sep">·</span>
+          <span>{{ att.uploadedAt | date:'mediumDate' }}</span>
+        </div>
+        <div class="am-file-actions">
+          <button class="am-btn am-btn-dl" (click)="download(att)"
+            title="{{ '::Compliance:Attachment:Download' | abpLocalization }}">
+            <i class="fa fa-download"></i>
+          </button>
+          <button class="am-btn am-btn-del" (click)="deleteAttachment(att)"
+            title="{{ '::Delete' | abpLocalization }}">
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="dismiss()">
+    {{ '::Close' | abpLocalization }}
+  </button>
+</div>

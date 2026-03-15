@@ -1,0 +1,130 @@
+<!-- ── Animated Hero ─────────────────────────────────────────── -->
+<div class="grci-page-header mb-4">
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <span class="hero-chip">
+          <span class="hero-chip-dot"></span> GRCi Platform v1.0
+        </span>
+      </div>
+      <h3 class="mb-1">
+        Compliance <span class="gradient-text">Management</span>
+      </h3>
+      <p class="mb-0">Governance &middot; Risk &middot; Compliance — built for modern enterprises</p>
+    </div>
+    @if(!hasLoggedIn){
+    <button type="button" (click)="login()" class="btn btn-light fw-bold px-5 py-2">
+      <i class="fa fa-sign-in me-2" style="color:var(--g-primary)"></i>Sign In
+    </button>
+    }
+  </div>
+</div>
+
+<!-- ── Stat Cards ─────────────────────────────────────────────── -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3">
+    <div class="card grci-stat-card stat-primary">
+      <div class="stat-icon" style="background:rgba(129,140,248,.15);color:var(--g-primary)">
+        <i class="fa fa-shield"></i>
+      </div>
+      <div class="stat-label">All Templates</div>
+      <div class="mt-3">
+        <a routerLink="/compliance/templates" class="btn btn-primary btn-sm px-4">
+          Open <i class="fa fa-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card grci-stat-card stat-success">
+      <div class="stat-icon" style="background:var(--g-success-bg);color:var(--g-success)">
+        <i class="fa fa-check-circle"></i>
+      </div>
+      <div class="stat-label">Approved</div>
+      <div class="mt-3">
+        <a routerLink="/compliance/templates" class="btn btn-sm px-4" style="background:var(--g-success-bg);color:var(--g-success);border:1px solid rgba(52,211,153,.3);border-radius:var(--g-r)">
+          View <i class="fa fa-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card grci-stat-card stat-warning">
+      <div class="stat-icon" style="background:var(--g-warning-bg);color:var(--g-warning)">
+        <i class="fa fa-clock-o"></i>
+      </div>
+      <div class="stat-label">Pending Review</div>
+      <div class="mt-3">
+        <a routerLink="/compliance/templates" class="btn btn-sm px-4" style="background:var(--g-warning-bg);color:var(--g-warning);border:1px solid rgba(251,191,36,.3);border-radius:var(--g-r)">
+          View <i class="fa fa-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card grci-stat-card stat-cyan">
+      <div class="stat-icon" style="background:var(--g-info-bg);color:var(--g-cyan)">
+        <i class="fa fa-plus-circle"></i>
+      </div>
+      <div class="stat-label">New Template</div>
+      <div class="mt-3">
+        <a routerLink="/compliance/templates/new" class="btn btn-sm px-4" style="background:var(--g-info-bg);color:var(--g-cyan);border:1px solid rgba(34,211,238,.3);border-radius:var(--g-r)">
+          Create <i class="fa fa-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Bottom Row ─────────────────────────────────────────────── -->
+<div class="row g-3">
+
+  <!-- Features Grid -->
+  <div class="col-lg-8">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center gap-2">
+        <i class="fa fa-rocket" style="color:var(--g-primary)"></i>
+        Platform Capabilities
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-4" *ngFor="let f of features">
+            <div class="feature-tile">
+              <div class="feature-icon" [style.color]="f.color" [style.background]="f.bg">
+                <i [class]="f.icon"></i>
+              </div>
+              <div class="fw-semibold small mb-1" style="color:var(--g-text)">{{ f.title }}</div>
+              <div style="font-size:.78rem;color:var(--g-text-muted)">{{ f.desc }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Nav -->
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center gap-2">
+        <i class="fa fa-bolt" style="color:var(--g-cyan)"></i>
+        Quick Navigation
+      </div>
+      <div class="card-body p-0">
+        <ul class="list-group list-group-flush" style="border-radius:0 0 var(--g-r-lg) var(--g-r-lg)">
+          <li class="list-group-item" *ngFor="let link of quickLinks">
+            <a [routerLink]="link.route" class="d-flex align-items-center gap-3 text-decoration-none py-1">
+              <span class="nav-icon-wrap" [style.color]="link.color" [style.background]="link.bg">
+                <i [class]="link.icon + ' fa-fw'"></i>
+              </span>
+              <span class="flex-grow-1 fw-medium" style="font-size:.875rem;color:var(--g-text)">{{ link.label }}</span>
+              <i class="fa fa-chevron-right" style="color:var(--g-text-dim);font-size:.65rem"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>

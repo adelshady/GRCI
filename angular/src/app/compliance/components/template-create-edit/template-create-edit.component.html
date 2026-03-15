@@ -1,0 +1,161 @@
+<!-- ── Two-column layout: step sidebar + form panel ─────────────── -->
+<div class="ce-layout">
+
+  <!-- ── LEFT: Step Sidebar ──────────────────────────────────────── -->
+  <div class="ce-steps">
+    <div class="ce-steps-header">
+      <i class="fa fa-file-text-o me-2"></i>
+      {{ (isEditMode ? '::Compliance:Template:EditTitle' : '::Compliance:Template:NewTitle') | abpLocalization }}
+    </div>
+
+    <div class="ce-step" [class.active]="true">
+      <div class="ce-step-num">1</div>
+      <div class="ce-step-info">
+        <div class="ce-step-title">Names</div>
+        <div class="ce-step-desc">English &amp; Arabic</div>
+      </div>
+    </div>
+
+    <div class="ce-step-connector"></div>
+
+    <div class="ce-step" [class.active]="true">
+      <div class="ce-step-num">2</div>
+      <div class="ce-step-info">
+        <div class="ce-step-title">Classification</div>
+        <div class="ce-step-desc">Agency &amp; code</div>
+      </div>
+    </div>
+
+    <div class="ce-step-connector"></div>
+
+    <div class="ce-step" [class.active]="true">
+      <div class="ce-step-num">3</div>
+      <div class="ce-step-info">
+        <div class="ce-step-title">Descriptions</div>
+        <div class="ce-step-desc">Optional bilingual</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT: Form Panel ───────────────────────────────────────── -->
+  <div class="ce-form-panel">
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="d-flex flex-column align-items-center py-5 gap-3">
+      <div class="spinner-border" style="width:2rem;height:2rem" role="status"></div>
+      <span style="color:var(--g-text-dim);font-size:.85rem">Loading…</span>
+    </div>
+
+    <form *ngIf="!loading" [formGroup]="form" (ngSubmit)="save()">
+
+      <!-- ── Section 1: Names ─────────────────────────────────────── -->
+      <div class="ce-section">
+        <div class="ce-section-label">
+          <span class="ce-section-num">1</span>Template Names
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">
+              {{ '::Compliance:Template:NameEn' | abpLocalization }}
+              <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="nameEn"
+              placeholder="Enter English name"
+              [class.is-invalid]="form.get('nameEn')?.invalid && form.get('nameEn')?.touched"
+            />
+            <div class="invalid-feedback" *ngIf="form.get('nameEn')?.hasError('required') && form.get('nameEn')?.touched">
+              {{ '::Compliance:Validation:NameEnRequired' | abpLocalization }}
+            </div>
+            <div class="invalid-feedback" *ngIf="form.get('nameEn')?.hasError('maxlength') && form.get('nameEn')?.touched">
+              {{ '::Compliance:Validation:MaxLength256' | abpLocalization }}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">{{ '::Compliance:Template:NameAr' | abpLocalization }}</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="nameAr"
+              placeholder="أدخل الاسم بالعربية"
+              dir="rtl"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Section 2: Classification ────────────────────────────── -->
+      <div class="ce-section">
+        <div class="ce-section-label">
+          <span class="ce-section-num">2</span>Classification
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">
+              {{ '::Compliance:Template:RegulatoryAgency' | abpLocalization }}
+              <span class="text-danger">*</span>
+            </label>
+            <select
+              class="form-select"
+              formControlName="regulatoryAgencyId"
+              [class.is-invalid]="form.get('regulatoryAgencyId')?.invalid && form.get('regulatoryAgencyId')?.touched"
+            >
+              <option value="">{{ '::Compliance:Template:SelectAgency' | abpLocalization }}</option>
+              <option *ngFor="let agency of agencies" [value]="agency.id">
+                {{ getAgencyDisplayName(agency) }}<ng-container *ngIf="agency.code"> ({{ agency.code }})</ng-container>
+              </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="form.get('regulatoryAgencyId')?.hasError('required') && form.get('regulatoryAgencyId')?.touched">
+              {{ '::Compliance:Validation:RegulatoryAgencyRequired' | abpLocalization }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Section 3: Descriptions ───────────────────────────────── -->
+      <div class="ce-section">
+        <div class="ce-section-label">
+          <span class="ce-section-num">3</span>Descriptions
+          <span class="ce-section-opt">optional</span>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">{{ '::Compliance:Template:DescriptionEn' | abpLocalization }}</label>
+            <textarea
+              class="form-control"
+              formControlName="descriptionEn"
+              rows="4"
+              placeholder="Enter a description in English…"
+            ></textarea>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">{{ '::Compliance:Template:DescriptionAr' | abpLocalization }}</label>
+            <textarea
+              class="form-control"
+              formControlName="descriptionAr"
+              rows="4"
+              dir="rtl"
+              placeholder="أدخل وصفاً بالعربية…"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Actions ────────────────────────────────────────────────── -->
+      <div class="ce-actions">
+        <button type="submit" class="btn btn-primary px-5 fw-semibold" [disabled]="saving">
+          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!saving" class="fa fa-save me-2"></i>
+          {{ '::Save' | abpLocalization }}
+        </button>
+        <button type="button" class="btn btn-outline-secondary px-4" (click)="cancel()" [disabled]="saving">
+          {{ '::Cancel' | abpLocalization }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</div>

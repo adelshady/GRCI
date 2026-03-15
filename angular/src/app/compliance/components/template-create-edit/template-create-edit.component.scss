@@ -1,0 +1,108 @@
+/* ── Two-column layout ─────────────────────────────────────────── */
+.ce-layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+/* ── Left Step Sidebar ─────────────────────────────────────────── */
+.ce-steps {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--g-glass);
+  border: 1px solid var(--g-border);
+  border-radius: var(--g-r-xl);
+  padding: 1.25rem;
+  backdrop-filter: blur(20px);
+  position: sticky;
+  top: 1rem;
+}
+
+.ce-steps-header {
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--g-text-dim);
+  padding-bottom: 1rem; margin-bottom: 1rem;
+  border-bottom: 1px solid var(--g-border);
+}
+
+.ce-step {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  opacity: 0.45;
+  transition: opacity 0.2s;
+  &.active { opacity: 1; }
+}
+
+.ce-step-num {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(129,140,248,.12); border: 1px solid rgba(129,140,248,.25);
+  color: var(--g-primary); font-size: 0.72rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.ce-step-title { font-size: 0.82rem; font-weight: 700; color: var(--g-text); }
+.ce-step-desc  { font-size: 0.68rem; color: var(--g-text-dim); margin-top: 0.1rem; }
+
+.ce-step-connector {
+  width: 2px; height: 20px; background: var(--g-border);
+  margin-left: 13px; /* center under the circle */
+}
+
+/* ── Right Form Panel ──────────────────────────────────────────── */
+.ce-form-panel {
+  flex: 1;
+  background: var(--g-glass);
+  border: 1px solid var(--g-border);
+  border-radius: var(--g-r-xl);
+  padding: 1.75rem;
+  backdrop-filter: blur(20px);
+}
+
+/* ── Sections ──────────────────────────────────────────────────── */
+.ce-section {
+  padding-bottom: 1.75rem;
+  margin-bottom: 1.75rem;
+  border-bottom: 1px solid var(--g-border);
+  &:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+}
+
+.ce-section-label {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--g-text-muted);
+  margin-bottom: 1rem;
+}
+
+.ce-section-num {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(129,140,248,.15); border: 1px solid rgba(129,140,248,.3);
+  color: var(--g-primary); font-size: 0.65rem; font-weight: 800;
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+
+.ce-section-opt {
+  font-size: 0.65rem; font-weight: 500; text-transform: lowercase;
+  letter-spacing: 0; color: var(--g-text-dim);
+  background: rgba(255,255,255,.04); border: 1px solid var(--g-border);
+  border-radius: 4px; padding: 0.1em 0.45em; margin-left: auto;
+}
+
+/* ── Actions ───────────────────────────────────────────────────── */
+.ce-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--g-border);
+  margin-top: 1.75rem;
+}
+
+/* ── Responsive: stack on small screens ────────────────────────── */
+@media (max-width: 768px) {
+  .ce-layout { flex-direction: column; }
+  .ce-steps { width: 100%; position: static; }
+}

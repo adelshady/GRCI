@@ -1,0 +1,152 @@
+<div class="modal-header im-header">
+  <div class="d-flex align-items-center gap-2">
+    <div class="im-header-icon">
+      <i class="fa fa-list-alt"></i>
+    </div>
+    <div>
+      <div class="im-header-title">
+        {{ (item ? '::Compliance:Item:EditTitle' : '::Compliance:Item:AddTitle') | abpLocalization }}
+      </div>
+      <div class="im-header-sub">Checklist item details</div>
+    </div>
+  </div>
+  <button type="button" class="btn-close btn-close-white" (click)="dismiss()"></button>
+</div>
+
+<div class="modal-body p-0">
+  <form [formGroup]="form" (ngSubmit)="save()">
+
+    <!-- ── Split layout: Left requirement + Right settings ──────── -->
+    <div class="im-split">
+
+      <!-- LEFT: Requirement content -->
+      <div class="im-left">
+
+        <!-- Section grouping -->
+        <div class="im-field-group mb-4">
+          <label class="im-label">
+            <i class="fa fa-folder-o me-1"></i>
+            {{ '::Compliance:Item:SectionTitle' | abpLocalization }}
+            <span class="im-optional">optional</span>
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="sectionTitle"
+            placeholder="Group items under a section heading…"
+          />
+        </div>
+
+        <!-- EN requirement -->
+        <div class="im-field-group mb-3">
+          <label class="im-label">
+            <i class="fa fa-file-text-o me-1"></i>
+            {{ '::Compliance:Item:RequirementEn' | abpLocalization }}
+            <span class="text-danger ms-1">*</span>
+          </label>
+          <textarea
+            class="form-control"
+            formControlName="requirementTextEn"
+            rows="5"
+            placeholder="Describe the compliance requirement in English…"
+            [class.is-invalid]="form.get('requirementTextEn')?.invalid && form.get('requirementTextEn')?.touched"
+          ></textarea>
+          <div class="invalid-feedback">
+            {{ '::Compliance:Validation:RequirementRequired' | abpLocalization }}
+          </div>
+        </div>
+
+        <!-- AR requirement -->
+        <div class="im-field-group">
+          <label class="im-label">
+            <i class="fa fa-language me-1"></i>
+            {{ '::Compliance:Item:RequirementAr' | abpLocalization }}
+            <span class="im-optional">optional</span>
+          </label>
+          <textarea
+            class="form-control"
+            formControlName="requirementTextAr"
+            rows="5"
+            dir="rtl"
+            placeholder="صف متطلبات الامتثال بالعربية…"
+          ></textarea>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Settings panel -->
+      <div class="im-right">
+
+        <div class="im-settings-title">
+          <i class="fa fa-sliders me-1"></i>Classification &amp; Settings
+        </div>
+
+        <!-- Criticality -->
+        <div class="im-field-group mb-3">
+          <label class="im-label">{{ '::Compliance:Item:Criticality' | abpLocalization }}</label>
+          <select class="form-select" formControlName="criticality">
+            <option *ngFor="let opt of criticalityOptions" [ngValue]="opt.value">
+              {{ opt.label | abpLocalization }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Derived weight display -->
+        <div class="im-field-group mb-3">
+          <label class="im-label">{{ '::Compliance:Item:Weight' | abpLocalization }}</label>
+          <div class="im-weight-display">
+            <span class="im-weight-value" [ngClass]="{
+              'weight-low':    derivedWeight === 1,
+              'weight-medium': derivedWeight === 2,
+              'weight-high':   derivedWeight === 3
+            }">{{ derivedWeight }}</span>
+            <span class="im-weight-hint">auto-calculated</span>
+          </div>
+        </div>
+
+        <!-- Notes required when -->
+        <div class="im-field-group mb-3">
+          <label class="im-label">{{ '::Compliance:Item:NotesRequiredWhen' | abpLocalization }}</label>
+          <select class="form-select" formControlName="notesRequiredWhen">
+            <option *ngFor="let opt of notesOptions" [ngValue]="opt.value">
+              {{ opt.label | abpLocalization }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Sort order -->
+        <div class="im-field-group mb-3">
+          <label class="im-label">{{ '::Compliance:Item:SortOrder' | abpLocalization }}</label>
+          <input type="number" class="form-control" formControlName="sortOrder" min="0" />
+        </div>
+
+        <!-- Mandatory toggle -->
+        <div class="im-mandatory-row">
+          <div class="im-mandatory-info">
+            <div class="im-mandatory-label">{{ '::Compliance:Item:IsMandatory' | abpLocalization }}</div>
+            <div class="im-mandatory-hint">Mark if this item is required</div>
+          </div>
+          <label class="im-toggle">
+            <input type="checkbox" formControlName="isMandatory" />
+            <span class="im-toggle-track">
+              <span class="im-toggle-thumb"></span>
+            </span>
+          </label>
+        </div>
+
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="dismiss()" [disabled]="saving">
+    {{ '::Cancel' | abpLocalization }}
+  </button>
+  <button type="button" class="btn btn-primary fw-semibold px-4" (click)="save()" [disabled]="saving">
+    <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
+    <i *ngIf="!saving" class="fa fa-save me-1"></i>
+    {{ '::Save' | abpLocalization }}
+  </button>
+</div>

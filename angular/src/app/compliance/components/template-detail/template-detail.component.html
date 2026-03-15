@@ -1,0 +1,209 @@
+<!-- Loading -->
+<div *ngIf="loading" class="d-flex flex-column align-items-center py-5 gap-3">
+  <div class="spinner-border" style="width:2.5rem;height:2.5rem" role="status"></div>
+  <span style="color:var(--g-text-dim)">Loading…</span>
+</div>
+
+<ng-container *ngIf="!loading && template">
+
+  <!-- ── Compact Top Bar ────────────────────────────────────────── -->
+  <div class="detail-topbar mb-3">
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <button class="back-btn" (click)="goBack()">
+        <i class="fa fa-arrow-left"></i>
+      </button>
+      <span class="topbar-divider"></span>
+      <span class="tpl-code-tag">{{ template.code }}</span>
+      <span class="topbar-name">{{ template.nameEn }}</span>
+      <span class="badge ms-1" [ngClass]="getBadgeClass(template.status)">
+        {{ getStatusLabel(template.status) | abpLocalization }}
+      </span>
+      <span class="topbar-ver">v{{ template.version }}</span>
+    </div>
+
+    <!-- Workflow + Edit actions -->
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <ng-container *ngIf="!actionLoading">
+        <button *ngIf="template.status === ChecklistTemplateStatus.Draft"
+          class="btn btn-warning btn-sm fw-bold" (click)="submit()">
+          <i class="fa fa-paper-plane me-1"></i>{{ '::Compliance:Workflow:Submit' | abpLocalization }}
+        </button>
+        <button *ngIf="template.status === ChecklistTemplateStatus.PendingApproval"
+          class="btn btn-success btn-sm fw-bold" (click)="approve()">
+          <i class="fa fa-check me-1"></i>{{ '::Compliance:Workflow:Approve' | abpLocalization }}
+        </button>
+        <button *ngIf="template.status === ChecklistTemplateStatus.PendingApproval"
+          class="btn btn-danger btn-sm fw-bold" (click)="openReturnModal(returnModal)">
+          <i class="fa fa-reply me-1"></i>{{ '::Compliance:Workflow:Return' | abpLocalization }}
+        </button>
+        <button *ngIf="template.status === ChecklistTemplateStatus.Returned"
+          class="btn btn-info btn-sm fw-bold" (click)="resubmit()">
+          <i class="fa fa-redo me-1"></i>{{ '::Compliance:Workflow:Resubmit' | abpLocalization }}
+        </button>
+        <button *ngIf="template.status === ChecklistTemplateStatus.Approved"
+          class="btn btn-secondary btn-sm fw-bold" (click)="archive()">
+          <i class="fa fa-archive me-1"></i>{{ '::Compliance:Workflow:Archive' | abpLocalization }}
+        </button>
+      </ng-container>
+      <span *ngIf="actionLoading" class="spinner-border spinner-border-sm"></span>
+      <button *ngIf="canEdit" class="btn btn-outline-primary btn-sm"
+        [routerLink]="['/compliance/templates', template.id, 'edit']">
+        <i class="fa fa-pencil me-1"></i>{{ '::Edit' | abpLocalization }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Info Strip (description + meta) ───────────────────────── -->
+  <div class="info-strip mb-3" *ngIf="template.descriptionEn || template.descriptionAr">
+    <div class="info-strip-item" *ngIf="template.descriptionEn">
+      <span class="info-strip-label">Description (EN)</span>
+      <span class="info-strip-value">{{ template.descriptionEn }}</span>
+    </div>
+    <div class="info-strip-sep" *ngIf="template.descriptionEn && template.descriptionAr"></div>
+    <div class="info-strip-item" *ngIf="template.descriptionAr">
+      <span class="info-strip-label">Description (AR)</span>
+      <span class="info-strip-value" dir="rtl">{{ template.descriptionAr }}</span>
+    </div>
+  </div>
+
+  <!-- ── Tab Bar ────────────────────────────────────────────────── -->
+  <div class="detail-tabs mb-3">
+    <button
+      class="detail-tab"
+      [class.active]="activeTab === 'items'"
+      (click)="activeTab = 'items'"
+    >
+      <i class="fa fa-list me-2"></i>
+      {{ '::Compliance:Item:ListTitle' | abpLocalization }}
+      <span class="tab-count">{{ activeItems.length }}</span>
+    </button>
+    <button
+      class="detail-tab"
+      [class.active]="activeTab === 'history'"
+      (click)="activeTab = 'history'"
+    >
+      <i class="fa fa-history me-2"></i>
+      {{ '::Compliance:History:Title' | abpLocalization }}
+      <span class="tab-count">{{ history.length }}</span>
+    </button>
+  </div>
+
+  <!-- ══════════════ TAB: ITEMS ════════════════════════════════════ -->
+  <div *ngIf="activeTab === 'items'">
+
+    <!-- Locked notice -->
+    <div *ngIf="!canEdit" class="locked-notice mb-3">
+      <i class="fa fa-lock me-2"></i>{{ '::Compliance:Item:LockedMessage' | abpLocalization }}
+    </div>
+
+    <!-- Add Item row -->
+    <div class="d-flex justify-content-end mb-3" *ngIf="canEdit">
+      <button class="btn btn-primary" (click)="openAddItem()">
+        <i class="fa fa-plus me-2"></i>{{ '::Compliance:Item:Add' | abpLocalization }}
+      </button>
+    </div>
+
+    <!-- Empty items -->
+    <div *ngIf="activeItems.length === 0" class="empty-tab-panel">
+      <i class="fa fa-list-ul empty-tab-icon"></i>
+      <div class="fw-semibold mt-2" style="color:var(--g-text-muted)">{{ '::Compliance:Item:NoItems' | abpLocalization }}</div>
+      <button *ngIf="canEdit" class="btn btn-primary btn-sm mt-3 px-4" (click)="openAddItem()">
+        <i class="fa fa-plus me-1"></i>Add First Item
+      </button>
+    </div>
+
+    <!-- Items as cards -->
+    <div class="items-stack" *ngIf="activeItems.length > 0">
+      <div class="item-row" *ngFor="let item of activeItems; let i = index">
+
+        <!-- Index -->
+        <div class="item-index">{{ i + 1 }}</div>
+
+        <!-- Content -->
+        <div class="item-content">
+          <div class="item-section-label" *ngIf="item.sectionTitle">
+            <i class="fa fa-folder-o me-1"></i>{{ item.sectionTitle }}
+          </div>
+          <div class="item-text">{{ item.requirementTextEn }}</div>
+          <div class="item-text-ar" *ngIf="item.requirementTextAr" dir="rtl">{{ item.requirementTextAr }}</div>
+        </div>
+
+        <!-- Meta chips -->
+        <div class="item-chips">
+          <span class="badge" [ngClass]="getCriticalityClass(item.criticality)">
+            {{ getCriticalityLabel(item.criticality) | abpLocalization }}
+          </span>
+          <span class="weight-chip">W{{ item.weight }}</span>
+          <span class="mandatory-chip" [class.mandatory-yes]="item.isMandatory" [class.mandatory-no]="!item.isMandatory">
+            <i class="fa" [class.fa-check]="item.isMandatory" [class.fa-times]="!item.isMandatory"></i>
+          </span>
+        </div>
+
+        <!-- Actions -->
+        <div class="item-actions">
+          <button class="item-btn item-btn-attach" (click)="openAttachments(item)" title="{{ '::Compliance:Item:Attachments' | abpLocalization }}">
+            <i class="fa fa-paperclip"></i>
+          </button>
+          <button *ngIf="canEdit" class="item-btn item-btn-edit" (click)="openEditItem(item)" title="{{ '::Edit' | abpLocalization }}">
+            <i class="fa fa-pencil"></i>
+          </button>
+          <button *ngIf="canEdit" class="item-btn item-btn-del" (click)="deleteItem(item)" title="{{ '::Delete' | abpLocalization }}">
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ TAB: HISTORY ══════════════════════════════════ -->
+  <div *ngIf="activeTab === 'history'">
+
+    <div *ngIf="history.length === 0" class="empty-tab-panel">
+      <i class="fa fa-history empty-tab-icon"></i>
+      <div class="fw-semibold mt-2" style="color:var(--g-text-muted)">{{ '::Compliance:History:NoHistory' | abpLocalization }}</div>
+    </div>
+
+    <!-- History timeline (horizontal cards) -->
+    <div class="history-grid" *ngIf="history.length > 0">
+      <div class="history-card" *ngFor="let entry of history">
+        <div class="history-card-icon" [ngClass]="getActionIcon(entry.action)"></div>
+        <div class="history-card-body">
+          <div class="history-action">{{ getActionLabel(entry.action) | abpLocalization }}</div>
+          <div class="history-flow">
+            <span class="badge badge-draft" style="font-size:.62rem">{{ getHistoryStatusLabel(entry.fromStatus) | abpLocalization }}</span>
+            <i class="fa fa-long-arrow-right mx-1" style="color:var(--g-text-dim);font-size:.7rem"></i>
+            <span class="badge badge-approved" style="font-size:.62rem">{{ getHistoryStatusLabel(entry.toStatus) | abpLocalization }}</span>
+          </div>
+          <div class="history-meta">
+            <span *ngIf="entry.performedByUserName"><i class="fa fa-user me-1"></i>{{ entry.performedByUserName }}</span>
+            <span><i class="fa fa-clock-o me-1"></i>{{ entry.performedAt | date:'mediumDate' }}</span>
+          </div>
+          <div *ngIf="entry.comment" class="history-comment">
+            <i class="fa fa-comment me-1"></i>{{ entry.comment }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</ng-container>
+
+<!-- Return Modal -->
+<ng-template #returnModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title"><i class="fa fa-reply me-2"></i>{{ '::Compliance:Workflow:ReturnTitle' | abpLocalization }}</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <label class="form-label">{{ '::Compliance:Workflow:ReturnComment' | abpLocalization }} <span style="color:var(--g-danger)">*</span></label>
+    <textarea class="form-control" [(ngModel)]="returnComment" rows="4" [placeholder]="'::Compliance:Workflow:ReturnCommentPlaceholder' | abpLocalization"></textarea>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">{{ '::Cancel' | abpLocalization }}</button>
+    <button type="button" class="btn btn-danger fw-bold" (click)="confirmReturn(modal)">
+      <i class="fa fa-reply me-1"></i>{{ '::Compliance:Workflow:Return' | abpLocalization }}
+    </button>
+  </div>
+</ng-template>
