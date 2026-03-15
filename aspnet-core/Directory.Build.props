@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <!-- Disable Git source-link tasks that require .gitignore access -->
+    <ContinuousIntegrationBuild>false</ContinuousIntegrationBuild>
+    <EmbedUntrackedSources>false</EmbedUntrackedSources>
+    <PublishRepositoryUrl>false</PublishRepositoryUrl>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
+  </PropertyGroup>
+</Project>
